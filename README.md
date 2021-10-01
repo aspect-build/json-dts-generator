@@ -1,4 +1,4 @@
-# json-dts-generator
+# json-to-dts
 
 Generate TS declaration files from JSON files. Suitable for both small and large datasets.
 
