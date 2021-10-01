@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.0.1](https://github.com/aspect-dev/json-dts-generator/compare/v2.0.0...v2.0.1) (2021-10-01)
+
+
+### Bug Fixes
+
+* export a const and not a type so that dts matches what typescript expects when it imports a json file ([2ecee05](https://github.com/aspect-dev/json-dts-generator/commit/2ecee05945d2830aa2afe725b1190e25954e57c3))
+
 ## [2.0.0](https://github.com/aspect-dev/json-dts-generator/compare/v1.0.0...v2.0.0) (2021-10-01)
 
 
