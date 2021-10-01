@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/aspect-dev/json-dts-generator/compare/v1.0.0...v2.0.0) (2021-10-01)
+
+
+### Features
+
+* switch to input_file and output_file ([94615e7](https://github.com/aspect-dev/json-dts-generator/commit/94615e75ff83625d3e8fba99df8c11765b19c22b))
+
 ## 1.0.0 (2020-07-07)
 
 
