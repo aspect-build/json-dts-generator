@@ -11,7 +11,7 @@ import {
   JSONValue,
   TypeDeclaration,
 } from "./core";
-import { commonDTS, relativeReExport } from "./output";
+import { generateDts } from "./output";
 
 if (module.parent) {
   throw new Error(
@@ -19,20 +19,9 @@ if (module.parent) {
   );
 }
 
-/**
- * Declaration file which will store declarations from all inputs.
- * Name chosen as such to hopefully avoid collision with an input file.
- **/
-const COMMON_FILE = "_common";
-const COMMON_DTS = COMMON_FILE + ".d.ts";
-
-const FILENAME = path.basename(__filename);
-
-const USAGE = `Usage: node ${FILENAME} INPUT-DIR OUTPUT-DIR`;
+const USAGE = `Usage: node ${path.basename(__filename)} <input_file> <output_file>`;
 const INSTRUCTIONS = `
-Reads all JSON files inside INPUT-DIR (including those in subdirectories),
-parses each into a TS declaration file with matching name and places those
-into OUTPUT-DIR, matching the folder structure inside of INPUT-DIR.
+Reads a json input file and outputs a corresponding TS declaration file.
 `.trim();
 
 const UNKNOWN_ARRAY_WARNING = (declarations: TypeDeclaration[]) => {
@@ -50,7 +39,7 @@ inferred because the provided JSON featured empty arrays:
 ${unfinishedTypeAliases}
 
 These type aliases have been given the type "unknown[]". Opening
-${COMMON_DTS} and manually providing the proper types is recommended.
+the output file and manually providing the proper types is recommended.
   `.trim();
 };
 
@@ -68,35 +57,20 @@ if (process.argv.length !== 4) {
   process.exit(1);
 }
 
-let cache = createCache();
-const inputDir = path.resolve(process.cwd(), process.argv[2]);
-const outputDir = path.resolve(process.cwd(), process.argv[3]);
+const inputFile = path.resolve(process.cwd(), process.argv[2]);
+const outputFile = path.resolve(process.cwd(), process.argv[3]);
 
-const inputFiles = glob.sync("**/*.json", { cwd: inputDir });
-const exportedTypes = new Set<string>();
-let currentFile = 1;
+console.log("Parsing JSON file...");
 
-console.log("Parsing JSON files...");
-for (const file of inputFiles) {
-  const json = readJSONSync(path.resolve(inputDir, file));
-  const result = convertToType(cache, json, file);
-  exportedTypes.add(result.type);
-  cache = result.cache;
+const json = readJSONSync(inputFile);
+const result = convertToType(createCache(), json, path.basename(inputFile));
 
-  mkdirp.sync(path.resolve(outputDir, path.dirname(file)));
-  const outputFile = path.resolve(outputDir, file.replace(".json", ".d.ts"));
-  fs.writeFileSync(
-    outputFile,
-    relativeReExport(result.type, outputDir, file, COMMON_FILE),
-  );
+console.log(`Creating ${outputFile} file...`);
 
-  console.log(`Finished file ${currentFile} of ${inputFiles.length}: ${file}`);
-  currentFile += 1;
-}
+mkdirp.sync(path.dirname(outputFile));
 
-console.log(`Creating ${COMMON_DTS} file...`);
-const output = fs.createWriteStream(path.resolve(outputDir, COMMON_DTS));
-for (const line of commonDTS(cache.map.values(), exportedTypes, {
+const output = fs.createWriteStream(outputFile);
+for (const line of generateDts(result.cache.map.values(), result.type, {
   computed: true,
   includeContexts: true,
 })) {
@@ -105,13 +79,13 @@ for (const line of commonDTS(cache.map.values(), exportedTypes, {
 output.close();
 
 const unknownArrays: TypeDeclaration[] = [];
-for (const declaration of cache.map.values()) {
+for (const declaration of result.cache.map.values()) {
   if (declaration.type === "unknown[]") {
     unknownArrays.push(declaration);
   }
 }
 
-console.log(COMMON_DTS + " created successfully.");
+console.log(`${outputFile} created successfully.`);
 
 if (unknownArrays.length) {
   console.log("\n" + UNKNOWN_ARRAY_WARNING(unknownArrays));

@@ -3,7 +3,7 @@ import { TypeDeclaration, typeAlias, identifierRegex } from "./core";
 
 export function typeDeclaration(
   declaration: TypeDeclaration,
-  { exported = false, computed = false, includeContexts = false } = {},
+  { computed = false, includeContexts = false } = {},
 ) {
   const name = typeAlias(declaration.id);
   const type = declaration.type;
@@ -22,7 +22,6 @@ export function typeDeclaration(
   }
 
   let typeDecl =
-    (exported ? "export " : "") +
     "type " +
     name +
     " = " +
@@ -34,9 +33,9 @@ export function typeDeclaration(
     : typeDecl;
 }
 
-export function* commonDTS(
+export function* generateDts(
   declarations: Iterable<TypeDeclaration>,
-  exportedTypes: Set<string>,
+  exportedType: string | undefined,
   { computed = false, includeContexts = false } = {},
 ) {
   if (computed) {
@@ -52,24 +51,12 @@ type C<A extends any> = {[K in keyof A]: A[K]} & {};
 
   for (const declaration of declarations) {
     yield typeDeclaration(declaration, {
-      exported: exportedTypes.has(typeAlias(declaration.id)),
       computed: computed,
       includeContexts: includeContexts,
     }) + "\n";
   }
-}
 
-export function relativeReExport(
-  type: string,
-  outDir: string,
-  file: string,
-  commonFile: string,
-) {
-  const outputFile = path.resolve(outDir, file.replace(".json", ".d.ts"));
-  const relativePath = path.relative(path.dirname(outputFile), outDir);
-  const relativeImport = relativePath
-    ? path.join(relativePath, commonFile)
-    : "./" + commonFile;
-
-  return `export { ${type} as default } from "${relativeImport}";`;
+  if (exportedType) {
+    yield `export { ${exportedType} as default };\n`;
+  }
 }

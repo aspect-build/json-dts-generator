@@ -1,43 +1,46 @@
 {
-  "name": "json-dts-generator",
+  "name": "json-to-dts",
   "version": "1.0.0",
-  "description": "Generate TS declaration files from JSON files.",
-  "homepage": "https://github.com/Asha20/json-dts-generator",
+  "description": "Generate TS declaration file from JSON file.",
+  "homepage": "https://github.com/aspect-dev/json-dts-generator",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Asha20/json-dts-generator"
+    "url": "git+https://github.com/aspect-dev/json-dts-generator"
   },
   "bugs": {
-    "url": "https://github.com/Asha20/json-dts-generator/issues"
+    "url": "https://github.com/aspect-dev/json-dts-generator/issues"
   },
   "main": "dist/json-dts.js",
   "bin": {
-    "json-dts-generator": "dist/json-dts.js"
+    "json-to-dts": "dist/json-dts.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rm -r dist/ && tsc",
+    "build": "rm -rf dist/ && tsc",
     "watch": "tsc --watch",
     "test": "jest",
     "release": "standard-version"
   },
-  "author": "Vukašin Stepanović <vukasinstepanovic@gmail.com>",
+  "authors": [
+    "Vukašin Stepanović <vukasinstepanovic@gmail.com>",
+    "Greg Magolan <greg@aspect.dev>"
+  ],
   "license": "MIT",
   "devDependencies": {
-    "@types/glob": "^7.1.1",
-    "@types/jest": "^26.0.0",
-    "@types/mkdirp": "^1.0.0",
-    "@types/node": "^14.0.13",
-    "jest": "^26.0.1",
-    "standard-version": "^8.0.0",
-    "ts-jest": "^26.1.0",
-    "typescript": "^3.9.5"
+    "@types/glob": "7.1.4",
+    "@types/jest": "27.0.2",
+    "@types/mkdirp": "1.0.2",
+    "@types/node": "14.x.x",
+    "jest": "27.2.4",
+    "standard-version": "9.3.1",
+    "ts-jest": "27.0.5",
+    "typescript": "4.4.3"
   },
   "dependencies": {
-    "glob": "^7.1.6",
-    "mkdirp": "^1.0.4"
+    "glob": "7.x.x",
+    "mkdirp": "1.x.x"
   },
   "keywords": [
     "typescript",

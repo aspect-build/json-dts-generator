@@ -1,5 +1,5 @@
 import { TypeDeclaration, Type } from "../src/core";
-import { typeDeclaration, relativeReExport, commonDTS } from "../src/output";
+import { typeDeclaration, generateDts } from "../src/output";
 
 describe("typeDeclaration()", () => {
   const declaration = (
@@ -16,13 +16,6 @@ describe("typeDeclaration()", () => {
   test("object type", () => {
     const input = declaration(0, { a: "string" });
     expect(typeDeclaration(input)).toBe("type T0 = { a: string; };");
-  });
-
-  test("exported type", () => {
-    const input = declaration(0, "string");
-    expect(typeDeclaration(input, { exported: true })).toBe(
-      "export type T0 = string;",
-    );
   });
 
   test("computed type", () => {
@@ -43,46 +36,34 @@ describe("typeDeclaration()", () => {
     const input = declaration(0, { foo: "number", bar: "string" }, ["root"]);
     expect(
       typeDeclaration(input, {
-        exported: true,
         computed: true,
         includeContexts: true,
       }),
-    ).toBe("export type T0 = C<{ foo: number; bar: string; }>; // root");
+    ).toEqual("type T0 = C<{ foo: number; bar: string; }>; // root");
   });
 });
 
-describe("relativeReExport()", () => {
-  test("same-level input", () => {
-    const result = relativeReExport("T1", "output", "input.json", "common");
-    expect(result).toBe(`export { T1 as default } from "./common";`);
-  });
-
-  test("input from subfolder", () => {
-    const result = relativeReExport("T1", "output", "foo/input.json", "common");
-    expect(result).toBe(`export { T1 as default } from "../common";`);
-  });
-});
-
-describe("commonDTS()", () => {
+describe("generateDts()", () => {
   test("compute helper", () => {
-    const result = commonDTS([], new Set(), { computed: true });
+    const result = generateDts([], undefined, { computed: true });
     expect([...result][0]).toContain(
       "type C<A extends any> = {[K in keyof A]: A[K]} & {};",
     );
   });
 
   test("exported and non-exported types", () => {
-    const result = commonDTS(
+    const result = generateDts(
       [
         { id: 0, type: "string", contexts: [] },
         { id: 1, type: "number", contexts: [] },
       ],
-      new Set(["T0"]),
+      "T0",
     );
 
     expect([...result]).toEqual([
-      "export type T0 = string;\n",
+      "type T0 = string;\n",
       "type T1 = number;\n",
+      "export { T0 as default };\n",
     ]);
   });
 });
