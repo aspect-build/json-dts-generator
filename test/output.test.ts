@@ -63,7 +63,7 @@ describe("generateDts()", () => {
     expect([...result]).toEqual([
       "type T0 = string;\n",
       "type T1 = number;\n",
-      "export { T0 as default };\n",
+      "\ndeclare const JSON: T0;\nexport default JSON;\n",
     ]);
   });
 });

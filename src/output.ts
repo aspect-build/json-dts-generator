@@ -57,6 +57,8 @@ type C<A extends any> = {[K in keyof A]: A[K]} & {};
   }
 
   if (exportedType) {
-    yield `export { ${exportedType} as default };\n`;
+    yield `
+declare const JSON: ${exportedType};
+export default JSON;\n`;
   }
 }
